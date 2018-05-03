@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:th="http://www.thymeleaf.org"
+	layout:decorate="~{admin/fragments/layout}">
+<head>
+<title>Agent</title>
+<link href="/static/admin/css/bootstrap-datetimepicker.css"
+	rel="stylesheet" />
+<script src="/static/admin/js/moment-with-locales.js"></script>
+<script src="/static/admin/js/bootstrap-datetimepicker.js"></script>
+<script th:inline="javascript">
+	function loadDistrict() {
+		var provinceId = $("#provinceId option:selected").val();
+		var url = '/admin/common/loadDistrict?provinceId=' + provinceId;
+		$.ajax({
+			url : url,
+			type : 'GET',
+			cache : false,
+			success : function(data) {
+				$('#districtDiv').html(data);
+				loadRegion();
+			}
+		});
+	}
+
+	function loadRegion() {
+		var districtId = $("#districtId option:selected").val();
+		var url = '/admin/common/loadRegion?districtId=' + districtId;
+		$.ajax({
+			url : url,
+			type : 'GET',
+			cache : false,
+			success : function(data) {
+				$('#regionDiv').html(data);
+			}
+		});
+	}
+</script>
+</head>
+<body>
+	<!--main content start-->
+	<section id="main-content" layout:fragment="content"
+		style="min-height: 700px">
+		<section class="wrapper">
+
+			<h4 style="margin-bottom: 20px">
+				<i class="fa fa-tasks"></i> <span>Quản lý khách hàng doanh nghiệp</span>
+			</h4>
+
+			<a href="/admin/agent/redirect?action=viewAdd" class="btn btn-info"
+				style="margin-bottom: 10px;">NHẬP TỪ EXCEL</a>
+			<!--  -->
+			<a href="/admin/agent/redirect?action=viewAdd" class="btn btn-info"
+				style="margin-bottom: 10px;">Mẫu EXCEL</a>
+
+			<div>
+				<section class="panel">
+					<header class="panel-heading">Thêm mới khách hàng doanh nghiệp</header>
+					<div class="panel-body">
+						<form role="form" class="form-horizontal" th:object="${agent}"
+							th:action="@{/admin/agent}" method="post">
+							
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Tên doanh nghiệp:</label>
+								<div class="col-lg-10">
+									<input th:name="agentName" type="text" class="form-control"
+										id="agentName" placeholder="Tên doanh nghiệp" th:required="required">
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Số điện thoại:</label>
+								<div class="col-lg-10">
+									<input th:name="phoneNumber" type="text" class="form-control"
+										id="phoneNumber" placeholder="Số điện thoại">
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Người đại diện:</label>
+								<div class="col-lg-10">
+									<input th:name="representative" type="text" class="form-control"
+										id="representative" placeholder="Người đại diện">
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Chức vụ:</label>
+								<div class="col-lg-10">
+									<input th:name="function" type="text" class="form-control"
+										id="function" placeholder="Chức vụ">
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Địa chỉ trụ sở:</label>
+								<div class="col-lg-10">
+									<input th:name="agentAddress" type="text" class="form-control"
+										id="agentAddress" placeholder="Địa chỉ trụ sở">
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Tài khoản số:</label>
+								<div class="col-lg-10">
+									<input th:name="bankAccount" type="text" class="form-control"
+										id="bankAccount" placeholder="Tài khoản số">
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Tại ngân hàng:</label>
+								<div class="col-lg-10">
+									<input th:name="bank" type="text" class="form-control"
+										id="bank" placeholder="Tại ngân hàng">
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Mã số thuế:</label>
+								<div class="col-lg-10">
+									<input th:name="taxCode" type="text" class="form-control"
+										id="taxCode" placeholder="Mã số thuế">
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Tỉnh/Thành
+									phố:</label>
+								<div class="col-lg-10">
+									<select class="form-control m-bot15" id="provinceId"
+										onchange="loadDistrict()">
+										<option value="-1">-- Chọn Tỉnh/Thành phố --</option>
+										<option th:each="p : ${provinces}" th:value="${{p}}"
+											th:text="${p.name}" />
+									</select>
+								</div>
+							</div>
+
+							<div id="districtDiv">
+								<div class="form-group">
+									<label class="col-lg-2 col-sm-2 control-label">Quận/huyện/thị
+										xã:</label>
+									<div class="col-lg-10">
+										<select class="form-control m-bot15" id="districtId"
+											onchange="loadRegion()">
+											<option value="-1">-- Chọn Quận/huyện/thị xã --</option>
+											<option th:each="d : ${districts}" th:value="${{d}}"
+												th:text="${d.name}" />
+										</select>
+									</div>
+								</div>
+							</div>
+
+							<div id="regionDiv">
+								<div class="form-group">
+									<label class="col-lg-2 col-sm-2 control-label">Khu vực:</label>
+									<div class="col-lg-10">
+										<select class="form-control m-bot15" th:name="region">
+											<option value="-1">-- Chọn Khu vực --</option>
+											<option th:each="r : ${regions}" th:value="${{r}}"
+												th:text="${r.name}" />
+										</select>
+									</div>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<div class="col-lg-offset-2 col-lg-10">
+									<button type="submit" class="btn btn-info">Thêm mới</button>
+									<a href="/admin/agent" class="btn btn-info">Quay lại</a>
+								</div>
+							</div>
+						</form>
+					</div>
+				</section>
+
+			</div>
+
+		</section>
+	</section>
+</body>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:th="http://www.thymeleaf.org"
+	layout:decorate="~{admin/fragments/layout}">
+<head>
+<title>Devices</title>
+<link href="/static/admin/css/bootstrap-datetimepicker.css"
+	rel="stylesheet" />
+<script src="/static/admin/js/moment-with-locales.js"></script>
+<script src="/static/admin/js/bootstrap-datetimepicker.js"></script>
+<script th:inline="javascript">
+	$(function() {
+		$('#datetimepicker').datetimepicker({
+			locale : 'vi',
+			format : 'DD/MM/YYYY',
+		});
+	});
+
+	function loadDistrict() {
+		var provinceId = $("#provinceId option:selected").val();
+		var url = '/admin/common/loadDistrict?provinceId=' + provinceId;
+		$.ajax({
+			url : url,
+			type : 'GET',
+			cache : false,
+			success : function(data) {
+				$('#districtDiv').html(data);
+				loadRegion();
+			}
+		});
+	}
+
+	function loadRegion() {
+		var districtId = $("#districtId option:selected").val();
+		var url = '/admin/common/loadRegion?districtId=' + districtId;
+		$.ajax({
+			url : url,
+			type : 'GET',
+			cache : false,
+			success : function(data) {
+				$('#regionDiv').html(data);
+			}
+		});
+	}
+</script>
+</head>
+<body>
+	<!--main content start-->
+	<section id="main-content" layout:fragment="content"
+		style="min-height: 700px">
+		<section class="wrapper">
+
+			<h4 style="margin-bottom: 20px">
+				<i class="fa fa-tasks"></i> <span>Quản lý thiết bị</span>
+			</h4>
+
+			<div>
+				<section class="panel">
+
+					<header class="panel-heading">Cập nhập thiết bị</header>
+
+					<div class="panel-body">
+						<form role="form" class="form-horizontal" th:object="${device}"
+							th:action="@{/admin/device}" method="post">
+
+							<input type="hidden" th:name="id" th:value="${device.id}" />
+
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Mã thiết
+									bị</label>
+								<div class="col-lg-10">
+									<input th:name="code" type="text" class="form-control"
+										th:value="${device.code}" id="code" placeholder="Mã thiết bị">
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Tỉnh/Thành
+									phố</label>
+								<div class="col-lg-10">
+									<select class="form-control m-bot15" id="provinceId"
+										onchange="loadDistrict()">
+										<option value="-1">-- Chọn Tỉnh/Thành phố --</option>
+										<option th:each="p : ${provinces}" th:value="${{p}}"
+											th:text="${p.name}"
+											th:if="${p.id==device.region?.district?.province?.id}"
+											selected />
+										<option th:each="p : ${provinces}" th:value="${{p}}"
+											th:text="${p.name}"
+											th:unless="${p.id==device.region?.district?.province?.id}" />
+									</select>
+								</div>
+							</div>
+
+							<div id="districtDiv">
+								<div class="form-group">
+									<label class="col-lg-2 col-sm-2 control-label">Quận/huyện/thị
+										xã</label>
+									<div class="col-lg-10">
+										<select class="form-control m-bot15" id="districtId"
+											onchange="loadRegion()">
+											<option value="-1">-- Chọn Quận/huyện/thị xã --</option>
+											<option th:each="d : ${districts}" th:value="${{d}}"
+												th:if="${d.id==device.region?.district?.id}" selected
+												th:text="${d.name}" />
+											<option th:each="d : ${districts}" th:value="${{d}}"
+												th:unless="${d.id==device.region?.district?.id}"
+												th:text="${d.name}" />
+										</select>
+									</div>
+								</div>
+							</div>
+
+							<div id="regionDiv">
+								<div class="form-group">
+									<label class="col-lg-2 col-sm-2 control-label">Khu vực</label>
+									<div class="col-lg-10">
+										<select class="form-control m-bot15" th:name="region">
+											<option value="-1">-- Chọn Khu vực --</option>
+											<option th:each="r : ${regions}" th:value="${{r}}"
+												th:if="${r.id==device.region?.id}" selected
+												th:text="${r.name}" />
+											<option th:each="r : ${regions}" th:value="${{r}}"
+												th:unless="${r.id==device.region?.id}" th:text="${r.name}" />
+										</select>
+									</div>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Ngày lắp
+									đặt</label>
+								<div class="col-lg-10">
+									<div class='input-group date' id='datetimepicker'>
+										<input type='text' class="form-control"
+											th:value="${#dates.format(device.setupDate, 'dd/MM/yyyy')}"
+											th:name="setupDateText" /> <span class="input-group-addon">
+											<span class="glyphicon glyphicon-calendar"></span>
+										</span>
+									</div>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<div class="col-lg-offset-2 col-lg-10">
+									<button type="submit" class="btn btn-info"
+										th:if="${action!='view'}">Cập nhập thiết bị</button>
+									<a href="/admin/device" class="btn btn-info">Quay lại</a>
+								</div>
+							</div>
+						</form>
+					</div>
+				</section>
+
+			</div>
+
+		</section>
+	</section>
+		<section id="js" layout:fragment="js">
+	    <!--   <script src="/static/admin/js/morris-script.js"></script>  -->
+	     <script src="/static/admin/js/moment-with-locales.js"></script>
+<script src="/static/admin/js/bootstrap-datetimepicker.js"></script>
+<script th:inline="javascript">
+	$(function() {
+		$('#datetimepicker').datetimepicker({
+			locale : 'vi',
+			format : 'DD/MM/YYYY',
+		});
+	});
+
+	function loadDistrict() {
+		var provinceId = $("#provinceId option:selected").val();
+		var url = '/admin/common/loadDistrict?provinceId=' + provinceId;
+		$.ajax({
+			url : url,
+			type : 'GET',
+			cache : false,
+			success : function(data) {
+				$('#districtDiv').html(data);
+				loadRegion();
+			}
+		});
+	}
+
+	function loadRegion() {
+		var districtId = $("#districtId option:selected").val();
+		var url = '/admin/common/loadRegion?districtId=' + districtId;
+		$.ajax({
+			url : url,
+			type : 'GET',
+			cache : false,
+			success : function(data) {
+				$('#regionDiv').html(data);
+			}
+		});
+	}
+</script>
+	      </section>
+</body>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:th="http://www.thymeleaf.org"
+	layout:decorate="~{admin/fragments/layout}">
+<head>
+<title>Thêm nhóm quyền</title>
+<link href="/static/admin/css/bootstrap-datetimepicker.css"
+	rel="stylesheet" />
+<script src="/static/admin/js/moment-with-locales.js"></script>
+<script src="/static/admin/js/bootstrap-datetimepicker.js"></script>
+
+</head>
+<body>
+	<!--main content start-->
+	<section id="main-content" layout:fragment="content"
+		style="min-height: 700px">
+		<section class="wrapper">
+
+			<h4 style="margin-bottom: 20px">
+				<i class="fa fa-tasks"></i> <span>Thêm nhóm quyền</span>
+			</h4>
+
+			
+
+			<div>
+				<section class="panel">
+					<header class="panel-heading">Thêm nhóm quyền</header>
+					<div class="panel-body">
+						<form role="form" class="form-horizontal" th:object="${gre}"
+							th:action="@{/admin/authorization/add}" method="post">
+							
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Nhóm quyền</label>
+								<div class="col-lg-10">
+									<input th:name="name" type="text" class="form-control"
+										id="code" placeholder="Nhóm quyền" th:required="required" th:value="${gre.name}">
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Quyền</label>
+								<div class="col-lg-10">
+								 <ul>
+								 	<li th:each="ro,iter : ${gre.rm}">
+								 	    <label class="checkbox-inline"> 
+<!-- 								 	            <input type="hidden" th:field="*{rm[__${iter.index}__].role.id}" th:value="${r.id}" >
+ -->								 	           <input type="hidden" th:field="*{rm[__${iter.index}__].role.id}" th:value="${ro.role.id}" >
+                                               <input type="checkbox" th:field="*{rm[__${iter.index}__].status}" id="inlineCheckbox1" value="${true}"> <span th:text="${ro.role.name}"></span>  
+                                          </label>
+								 	</li>
+								       
+								 </ul>
+									
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label"></label>
+								<div class="col-lg-10" th:if="${gre.name!=null}">
+								
+								   <button type="submit" class="btn btn-info">Sửa</button>
+								   
+								   <a href="grouproles" class="btn btn-info">Quay lại</a>
+									
+								</div>
+								<div class="col-lg-10" th:unless="${gre.name!=null}">
+								
+								   <button type="submit" class="btn btn-info">Thêm</button>
+								   
+								   <a href="grouproles" class="btn btn-info">Quay lại</a>
+									
+								</div>
+							</div>
+						</form>
+					</div>
+				</section>
+
+			</div>
+
+		</section>
+	</section>
+</body>

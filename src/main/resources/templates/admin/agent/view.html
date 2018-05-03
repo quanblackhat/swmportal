@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:th="http://www.thymeleaf.org"
+	layout:decorate="~{admin/fragments/layout}">
+<head>
+<title>Agent</title>
+</head>
+<body>
+	<!--main content start-->
+	<section id="main-content" layout:fragment="content"
+		style="min-height: 700px">
+		<section class="wrapper">
+
+			<h4 style="margin-bottom: 20px">
+				<i class="fa fa-tasks"></i> <span>Quản lý khách hàng doanh nghiệp</span>
+			</h4>
+
+			<a
+				th:href="@{'/admin/agent/redirect?action=viewCreateForm&id=' + ${agent.id}}"
+				class="btn btn-info" style="margin-bottom: 10px;">TẠO ĐƠN ĐỀ
+				NGHỊ</a>
+
+			<!--  -->
+			<a th:href="@{'/admin/agent/loadAssign?id=' + ${agent.id}}"
+				class="btn btn-info" style="margin-bottom: 10px;">Gán thiết bị</a>
+
+			<div>
+				<section class="panel">
+
+					<header class="panel-heading">Thông tin khách hàng</header>
+
+					<div class="panel-body" style="font-size: 14px">
+
+						<div class="form-group">
+							<label class="col-lg-2 col-sm-2 control-label">Tên khách
+								hàng:</label>
+							<div>
+								<span th:text="${agent.agentName}"></span> <br
+									th:if="${agent.agentName==''}" />
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-lg-2 col-sm-2 control-label">Số điện
+								thoại:</label>
+							<div>
+								<span th:text="${agent.phoneNumber}"></span> <br
+									th:if="${agent.phoneNumber==null||agent.phoneNumber==''}" />
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-lg-2 col-sm-2 control-label">Địa chỉ:</label>
+							<div>
+								<span th:text="${agent.agentAddress}"></span> <br
+									th:if="${agent.agentAddress==null||agent.agentAddress==''}" />
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-lg-2 col-sm-2 control-label">Tỉnh/Thành
+								phố:</label>
+							<div>
+								<span th:text="${agent.region?.district?.province?.name}"></span>
+								<br
+									th:if="${agent.region?.district?.province?.name==null||agent.region?.district?.province?.name==''}" />
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-lg-2 col-sm-2 control-label">Quận/huyện/thị
+								xã:</label>
+							<div>
+								<span th:text="${agent.region?.district?.name}"></span> <br
+									th:if="${agent.region?.district?.name==null||agent.region?.district?.name==''}" />
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-lg-2 col-sm-2 control-label">Khu vực</label>
+							<div>
+								<span th:text="${agent.region?.name}"></span> <br
+									th:if="${agent.region?.name==null||agent.region?.name==''}" />
+							</div>
+						</div>
+
+						<div class="form-group">
+							<div class="col-lg-offset-2">
+								<a href="/admin/agent" class="btn btn-info">Quay lại</a>
+							</div>
+						</div>
+					</div>
+				</section>
+
+			</div>
+
+		</section>
+	</section>
+</body>

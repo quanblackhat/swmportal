@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<!--  xmlns:sec="http://www.thymeleaf.org/extras/spring-security" -->
+<div id="sidebar" class="nav-collapse " th:fragment="sidebar">
+	<!-- sidebar menu start-->
+	<ul class="sidebar-menu" id="nav-accordion">
+		<li sec:authorize="hasRole('ROLE_MNU_DASHBOARD')"><a
+			class="active" href="/admin"> <i class="fa fa-dashboard"></i> <span>Dashboard</span>
+		</a></li>
+		<li class="sub-menu"><a
+			href="javascript:;"> <i class="fa fa-address-card"></i> <span>Thông
+					tin chung</span>
+		</a>
+			<ul class="sub">
+				<li><a href="#">Đơn giá</a></li>
+				<li><a href="#">Công Văn</a></li>
+			</ul></li>
+		<li class="sub-menu" sec:authorize="hasRole('ROLE_MNU_ACCOUNT')"><a
+			href="javascript:;"> <i class="fa fa-address-card"></i> <span>Quản
+					lý tài khoản</span>
+		</a>
+			<ul class="sub">
+				<li><a href="/admin/account/profile">Thông tin tài khoản</a></li>
+				<li><a href="/admin/account/list">Danh sách tài khoản</a></li>
+				<li><a href="/admin/account/add">Thêm tài khoản</a></li>
+
+			</ul></li>
+
+		<!-- company -->
+		<li class="sub-menu" sec:authorize="hasRole('ROLE_MNU_COMPANY')"><a
+			href="/admin/company"> <i class="fa fa-user-circle"></i> <span>Công
+					ty nước</span>
+		</a></li>
+
+		<!-- enterprise customer -->
+		<li class="sub-menu" sec:authorize="hasRole('ROLE_MNU_ENTERPRISE')"><a
+			href="/admin/agent"> <i class="fa fa-users"></i> <span>KH
+					doanh nghiệp</span>
+		</a></li>
+		
+		<!-- individual customer -->
+		<li class="sub-menu" sec:authorize="hasRole('ROLE_MNU_INDIVIDUAL')"><a
+			href="/admin/users"> <i class="fa fa-user"></i> <span>KH
+					cá nhân</span>
+		</a></li>
+
+		<!-- contract -->
+		<li class="sub-menu" sec:authorize="hasRole('ROLE_MNU_CONTRACT')"><a href="/admin/contract"> <i
+				class="fa fa-book"></i> <span>Quản lý hợp đồng</span>
+		</a></li>
+
+		<!-- device -->
+		<li class="sub-menu" sec:authorize="hasRole('ROLE_MNU_DEVICE')">
+            <a href="#"> <i class="fa fa-th"></i> <span>Quản lý thiết bị</span></a>
+			<ul class="sub">
+				<li><a href="/admin/device">Danh sách thiết bị</a></li>
+				<li><a href="#">Thông tin đấu nối</a></li>
+			</ul>
+        </li>
+
+		<li class="sub-menu" sec:authorize="hasRole('ROLE_MNU_AUTHORIZATION')"><a
+			href="javascript:;"> <i class=" fa fa-envelope"></i> <span>Quản
+					lý phân quyền</span>
+		</a>
+			<ul class="sub">
+				<li><a href="/admin/authorization/grouproles">Nhóm quyền</a></li>
+
+				<!-- 		<li><a href="/admin/authorization/roles">Danh sách quyền</a></li> -->
+				<li><a href="/admin/authorization/add">Thêm nhóm quyền</a></li>
+			</ul></li>
+
+		<li class="sub-menu" sec:authorize="hasRole('ROLE_MNU_REPORT')"><a
+			href="javascript:;"> <i class=" fa
+								fa-bar-chart-o"></i>
+				<span>Quản lý báo cáo</span>
+		</a>
+			<ul class="sub">
+				<li><a href="/admin/report/trackingWater">Tình hình sử dụng
+						nước</a></li>
+				<li><a href="/admin/report/trackingMoney">Xem tiền nước</a></li>
+				<!--<li><a href="/admin/report/chart">Chất lượng nguồn-->
+				<!--nước</a></li>-->
+				<!--<li><a href="/admin/report/dataamount">data</a></li>-->
+
+			</ul></li>
+
+
+
+<!-- 		<li class="sub-menu" sec:authorize="hasRole('ROLE_MNU_SETTING')"><a -->
+<!-- 			href="javascript:;"> <i class="fa fa-cogs"></i> <span>Cài -->
+<!-- 					đặt</span> -->
+<!-- 		</a> -->
+<!-- 			<ul class="sub"> -->
+<!-- 				<li><a href="lobby.html">Thiết lập giá</a></li> -->
+<!-- 				<li><a href="chat_room.html">Thiết lập chung</a></li> -->
+<!-- 			</ul></li> -->
+	</ul>
+	<!-- sidebar menu end-->
+</div>
+
+<!--sidebar end-->
+</html>

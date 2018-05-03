@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:th="http://www.thymeleaf.org"
+	layout:decorate="~{admin/fragments/layout}">
+<head>
+<title>Devices</title>
+<link href="/static/admin/css/bootstrap-datetimepicker.css"
+	rel="stylesheet" />
+<script src="/static/admin/js/jquery.twbsPagination.min.js"></script>
+<script src="/static/admin/js/moment-with-locales.js"></script>
+<script src="/static/admin/js/bootstrap-datetimepicker.js"></script>
+<script src="/static/admin/js/checkbox.js"></script>
+<script th:inline="javascript">
+		$(document).ready(function() {
+			$(function() {
+				hiddenButton();
+				var currentPage = [[${page}]];
+				var $pagination = $('#pagination');
+				window.pagObj = $('#pagination').twbsPagination({
+					totalPages :  [[${totalPages}]],
+					visiblePages : 6,
+					startPage : currentPage,
+					onPageClick : function(event, page) {
+					}
+				}).on('page', function(event, page) {
+					var regionId = $("#regionId option:selected").val();
+					var provinceId = $("#provinceId option:selected").val();
+					var districtId = $("#districtId option:selected").val();
+					var status = $("#status option:selected").val();
+					var setupDate = $("#setupDate").val();
+					var name = $("#name").val();
+					var url = '/admin/contract?page=' + page
+							+'&regionId=' + regionId
+							+'&districtId=' + districtId
+							+'&provinceId=' + provinceId
+							+'&name=' + name
+							+'&status=' + status;
+					$.ajax({
+						url : url,
+						type : 'GET',
+						cache : false,
+						success : function(data) {
+							$('#tableDevices').html(data);
+							loadChecked();
+						}
+					});
+				});
+			});
+		});
+		
+		function loadDistrict() {
+			var provinceId = $("#provinceId option:selected").val();
+			var url = '/admin/common/loadDistrict?action=search&provinceId=' + provinceId;
+			$.ajax({
+				url : url,
+				type : 'GET',
+				cache : false,
+				success : function(data) {
+					$('#districtDiv').html(data);
+					loadRegion();
+				}
+			});
+		}
+
+		function loadRegion() {
+			var districtId = $("#districtId option:selected").val();
+			var url = '/admin/common/loadRegion?action=search&districtId=' + districtId;
+			$.ajax({
+				url : url,
+				type : 'GET',
+				cache : false,
+				success : function(data) {
+					$('#regionDiv').html(data);
+				}
+			});
+		}
+		
+		function deleteContracts() {
+			$('#deleteForm').submit();
+		}
+		
+		function searchContracts(){
+			$('#searchForm').submit();
+		}
+	</script>
+
+<style type="text/css">
+.form-control {
+	width: 50%;
+}
+
+.form-group select {
+	width: 50%;
+}
+
+.col-lg-10 {
+	float: none
+}
+
+.input-group {
+	width: 50%;
+}
+</style>
+</head>
+<body>
+	<!--main content start-->
+	<section id="main-content" layout:fragment="content"
+		style="min-height: 700px">
+		<section class="wrapper">
+			<!-- main body -->
+			<h4 style="margin-bottom: 20px">
+				<i class="fa fa-tasks"></i> <span>Quản lý hợp đồng</span>
+			</h4>
+			<!-- Search -->
+			<form role="form" class="form-horizontal" id="searchForm"
+				th:action="@{/admin/contract}" method="get">
+				<div class="form-group">
+					<label class="col-lg-2 col-sm-2 control-label">Tên khách
+						hàng</label>
+					<div class="col-lg-10">
+						<input th:name="name" type="text" class="form-control" id="name"
+							th:value="${name}" placeholder="Tên khách hàng">
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-lg-2 col-sm-2 control-label">Tỉnh/Thành
+						phố</label>
+					<div class="col-lg-10">
+						<select class="form-control" onchange="loadDistrict()"
+							id="provinceId" th:name="provinceId">
+							<option value="-1">-- Tất cả --</option>
+							<option th:each="p : ${provinces}" th:value="${{p}}"
+								th:text="${p.name}" th:if="${p.id==provinceId}" selected />
+							<option th:each="p : ${provinces}" th:value="${{p}}"
+								th:text="${p.name}" th:unless="${p.id==provinceId}" />
+						</select>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-lg-2 col-sm-2 control-label">Quận/huyện/thị
+						xã</label>
+					<div id="districtDiv" class="col-lg-10">
+						<select class="form-control" onchange="loadRegion()"
+							id="districtId" th:name="districtId">
+							<option value="-1">-- Tất cả --</option>
+							<option th:each="d : ${districts}" th:value="${{d}}"
+								th:text="${d.name}" th:if="${d.id==districtId}" selected />
+							<option th:each="d : ${districts}" th:value="${{d}}"
+								th:text="${d.name}" th:unless="${d.id==districtId}" />
+						</select>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-lg-2 col-sm-2 control-label">Khu vực</label>
+					<div id="regionDiv" class="col-lg-10">
+						<select class="form-control" th:name="regionId" id="regionId">
+							<option value="-1">-- Tất cả --</option>
+							<option th:each="r : ${regions}" th:value="${{r}}"
+								th:text="${r.name}" th:if="${r.id==regionId}" selected />
+							<option th:each="r : ${regions}" th:value="${{r}}"
+								th:text="${r.name}" th:unless="${r.id==regionId}" />
+						</select>
+					</div>
+				</div>
+
+
+				<div class="form-group">
+					<label class="col-lg-2 col-sm-2 control-label">Trạng thái</label>
+					<div id="regionDiv" class="col-lg-10">
+						<select class="form-control" th:name="status" id="status">
+							<option value="-1">-- Tất cả --</option>
+							<option value="1" th:if="${status==1}" selected>Hoạt động</option>
+							<option value="1" th:unless="${status==1}">Hoạt động</option>
+							<option value="0" th:if="${status==0}" selected>Tạm dừng</option>
+							<option value="0" th:unless="${status==0}">Tạm dừng</option>
+						</select>
+					</div>
+
+				</div>
+
+			</form>
+
+			<button onclick="deleteContracts()" id="deletes"
+				class="btn btn-danger">Xóa</button>
+
+			<button type="submit" class="btn btn-info" onclick="searchContracts()"
+				style="margin-bottom: 10px;">Tìm kiếm</button>
+
+			<div class="row">
+				<div class="col-lg-12">
+					<section class="panel">
+						<header class="panel-heading">Danh sách hợp đồng</header>
+						<table class="table table-striped table-advance table-hover"
+							id="tableDevices">
+							<thead>
+								<tr>
+									<th><input type="checkbox" id="inputSelectAll" onchange="selectAll();"></th>
+									<th>Tên khách hàng</th>
+									<th>Loại</th>
+									<th>Mục đích sử dụng</th>
+									<th>Trạng thái</th>
+									<th>Khu vực</th>
+									<th style="text-align: center;">Quận/huyện/thị xã</th>
+									<th>Tỉnh/thành phố</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="c : ${contracts}">
+									<td><input type="checkbox" th:name="chooses"
+										th:value="${c.id}" th:id="${c.id}" class="fucker"
+										th:onchange="'saveChecked(' + ${c.id} + ')'"></td>
+									<td>
+										<span th:if="${c.user==null}" th:text="${c.agent?.agentName}"></span>
+										<span th:unless="${c.user==null}" th:text="${c.user?.name}"></span>
+									</td>
+									<td>
+										<span th:if="${c.user==null}">Doanh nghiệp</span>
+										<span th:unless="${c.user==null}">Cá nhân</span>
+									</td>
+									<td><span th:text="${c.uses?.name}"></span></td>
+									<td><span th:if="${c.status==1}">Hoạt động</span> <!--  -->
+										<span th:if="${c.status==0}">Tạm dừng</span></td>
+									<td>
+										<span th:if="${c.user!=null}" th:text="${c.user?.region?.name}"></span>
+										<span th:unless="${c.user!=null}" th:text="${c.agent?.region?.name}"></span>
+									</td>
+									<td>
+										<span th:if="${c.user!=null}" th:text="${c.user?.region?.district?.name}"></span>
+										<span th:unless="${c.user!=null}" th:text="${c.agent?.region?.district?.name}"></span>
+									</td>
+									<td>
+										<span th:if="${c.user!=null}" th:text="${c.user?.region?.district?.province?.name}"></span>
+										<span th:unless="${c.user!=null}" th:text="${c.agent?.region?.district?.province?.name}"></span>
+									</td>
+									<td><a th:if="${c.status==0}"
+										th:href="@{'/admin/contract/active?status=1&id=' + ${c.id}}"
+										class="btn btn-success btn-xs"> <i class="fa fa-check"></i>
+									</a> <a th:if="${c.status==1}"
+										th:href="@{'/admin/contract/active?status=0&id=' + ${c.id}}"
+										class="btn btn-danger btn-xs"> <i class="fa fa-power-off"></i>
+									</a></td>
+								</tr>
+							</tbody>
+						</table>
+					</section>
+
+				</div>
+			</div>
+
+			<ul id="pagination" class="pagination-sm pagination"
+				style="float: right"></ul>
+
+			<form role="form" class="form-horizontal" id="deleteForm"
+				th:action="@{/admin/contract/delete}" method="post">
+				<div style="display: none" id="addcheckbox"></div>
+			</form>
+
+			<!-- end main body -->
+		</section>
+	</section>
+	<!--main content end-->
+</body>
+
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>HÓA ĐƠN</title>
+        <link rel="stylesheet" href="/static/admin/css/bootstrap.min.css" type="text/css">
+        <link rel="stylesheet" href="/static/admin/css/bootstrap-reset.css" type="text/css">
+
+        <style>
+            .bordered-area{
+                border: 1px solid black;
+                padding: 3px;
+            }
+            .row{
+                margin-left: 30px;
+            }
+            @media print
+            {
+                div{
+                    page-break-inside: avoid;
+                }
+            }
+        </style>
+    </head>
+
+    <body style="size: A4; font-size: 10px; border: 1px solid black;">
+        <div class="panel" th:each="data: ${invoices}">
+            <div class="row">
+                <div class="col-sm-4 col-xs-4" style="text-align: left; margin-top: 10px">
+                    <h6><strong th:text="${data?.companyName}"></strong></h6>
+                    <p th:text="${data?.companyAddress}"></p>
+                </div>
+                <div class="col-sm-4 col-xs-4" style="text-align: center">
+                    <h6><strong>HÓA ĐƠN GIÁ TRỊ GIA TĂNG</strong></h6>
+                    <h6><strong>(TIỀN NƯỚC)</strong></h6>
+                    <p>(Liên 2: Giao Khách Hàng)</p>
+                    <p>Tháng <span th:text="${data?.month}"></span> năm <span th:text="${data?.year}"></span> </p>
+                </div>
+                <!--<div class="col-sm-2 col-xs-2 bordered-area" style="margin-top: 15px; margin-left: 15px; min-width: 150px">-->
+                    <!--<p>Mã số thuế : <span>0105145445</span><br>-->
+                    <!--Kí hiệu : <span><strong>AA17T</strong></span><br>-->
+                    <!--Số : <span>030254</span></p>-->
+                <!--</div>-->
+            </div>
+
+            <div class="row">
+                <div class="col-sm-5 col-xs-5 bordered-area" style="margin-left: 20px; margin-bottom: 7px">
+                    <p>Tên Khách Hàng: <span th:text="${data?.customerName}" class="pull-right"></span><br>
+                    Địa chỉ: <span th:text="${data?.customerAddress}" class="pull-right"></span><br>
+                    Mã số thuế: <span th:text="${data?.customerTaxCode}" class="pull-right"></span><br>
+                    Mã số hợp đồng: <span th:text="${data?.contractNumber}" class="pull-right"></span><br>
+                    Mã số thiết bị: <span th:text="${data?.device?.code}" class="pull-right"></span><br>
+                </div>
+
+                <div class="col-sm-5 col-xs-5 bordered-area" style="margin-left: 20px; margin-bottom: 7px">
+                    <p>Thời gian sử dụng: <span th:text="${timeUsed}" class="pull-right"></span><br>
+                    Ngày làm hóa đơn: <span th:text="${#dates.format(data?.createdDate, 'dd/MM/yyyy')}" class="pull-right"></span><br>
+                    Chỉ số đầu kì(m3): <span th:text="${data?.oldMetric}" class="pull-right"></span><br>
+                    Chỉ số cuối kì(m3): <span th:text="${data?.newMetric}" class="pull-right"></span><br>
+                    Tiêu thụ(m3): <span th:text="${data?.amount}" class="pull-right"></span></p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-11 col-xs-11">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Phân loại</th>
+                            <th>Số nước tiêu thụ (m3)</th>
+                            <th>Đơn giá (m3)</th>
+                            <th>Thành tiền</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${price == null}" th:each="pd: ${data.priceDetails}">
+                            <td th:if="${pd.end != null}"><span th:text="${pd.start}"></span> - <span th:text="${pd.end}"></span></td>
+                            <td th:if="${pd.end == null}"> > <span th:text="${pd.start}"></span></td>
+                            <td th:text="${#numbers.formatDecimal(pd.amount, 1, 3)}"></td>
+                            <td th:text="${#numbers.formatDecimal(pd.price, 1, 3)}"></td>
+                            <td th:text="${#numbers.formatDecimal(pd.total, 1, 3)}"></td>
+                        </tr>
+                        <tr th:if="${data.price != null}">
+                            <td><span th:text="${data.usesName}"></span> </td>
+                            <td th:text="${#numbers.formatDecimal(data.amount, 1, 2)}"></td>
+                            <td th:text="${#numbers.formatDecimal(data.price, 1, 2)}"></td>
+                            <td th:text="${#numbers.formatDecimal(data.waterMoney, 1, 2)}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-4 col-xs-4">
+                    <p>Cộng tiền nước : <br>
+                        Phí bảo vệ môi trường (<span th:text="${data.environmentTax}"></span>%) : <br>
+                        Thuế VAT (<span th:text="${data.vatTax}"></span>%) :
+                    </p>
+                    <p>
+                        <strong>Tổng cộng: </strong>
+                    </p>
+                </div>
+                <div class="col-sm-2 col-xs-2 ">
+                   <div class="pull-right">
+                       <p><span th:text="${#numbers.formatDecimal(data.waterMoney, 1, 2)}"></span><br>
+                           <span th:text="${#numbers.formatDecimal(data.envMoney, 1, 2)}"></span><br>
+                           <span th:text="${#numbers.formatDecimal(data.vatMoney, 1, 2)}"></span>
+                       </p>
+                       <p>
+                           <strong th:text="${#numbers.formatDecimal(data.totalMoney, 1, 2)}"></strong> VNĐ
+                       </p>
+                   </div>
+                </div>
+            </div>
+            <hr>
+        </div>
+
+    </body>
+</html>

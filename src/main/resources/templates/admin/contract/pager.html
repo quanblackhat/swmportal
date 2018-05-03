@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:th="http://www.thymeleaf.org">
+
+<table class="table table-striped table-advance table-hover"
+	id="tableDevices">
+	<thead>
+		<tr>
+			<th><input type="checkbox" id="inputSelectAll"
+				onchange="selectAll();"></th>
+			<th>Tên khách hàng</th>
+			<th>Loại</th>
+			<th>Mục đích sử dụng</th>
+			<th>Trạng thái</th>
+			<th>Khu vực</th>
+			<th style="text-align: center;">Quận/huyện/thị xã</th>
+			<th>Tỉnh/thành phố</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr th:each="c : ${contracts}">
+			<td><input type="checkbox" th:name="chooses" th:value="${c.id}"
+				th:id="${c.id}" class="fucker"
+				th:onchange="'saveChecked(' + ${c.id} + ')'"></td>
+			<td><span th:if="${c.user==null}"
+				th:text="${c.agent?.agentName}"></span> <span
+				th:unless="${c.user==null}" th:text="${c.user?.name}"></span></td>
+			<td><span th:if="${c.user==null}">Doanh nghiệp</span> <span
+				th:unless="${c.user==null}">Cá nhân</span></td>
+			<td><span th:text="${c.uses?.name}"></span></td>
+			<td><span th:if="${c.status==1}">Hoạt động</span> <!--  --> <span
+				th:if="${c.status==0}">Tạm dừng</span></td>
+			<td><span th:if="${c.user!=null}"
+				th:text="${c.user?.region?.name}"></span> <span
+				th:unless="${c.user!=null}" th:text="${c.agent?.region?.name}"></span>
+			</td>
+			<td><span th:if="${c.user!=null}"
+				th:text="${c.user?.region?.district?.name}"></span> <span
+				th:unless="${c.user!=null}"
+				th:text="${c.agent?.region?.district?.name}"></span></td>
+			<td><span th:if="${c.user!=null}"
+				th:text="${c.user?.region?.district?.province?.name}"></span> <span
+				th:unless="${c.user!=null}"
+				th:text="${c.agent?.region?.district?.province?.name}"></span></td>
+			<td><a th:if="${c.status==0}"
+				th:href="@{'/admin/contract/active?status=1&id=' + ${c.id}}"
+				class="btn btn-success btn-xs"> <i class="fa fa-check"></i>
+			</a> <a th:if="${c.status==1}"
+				th:href="@{'/admin/contract/active?status=0&id=' + ${c.id}}"
+				class="btn btn-danger btn-xs"> <i class="fa fa-power-off"></i>
+			</a></td>
+		</tr>
+	</tbody>
+</table>

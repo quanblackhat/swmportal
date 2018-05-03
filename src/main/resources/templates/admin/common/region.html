@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:th="http://www.thymeleaf.org">
+
+<div th:if="${action!='search'}">
+	<div class="form-group">
+		<label class="col-lg-2 col-sm-2 control-label">Khu vực</label>
+		<div class="col-lg-10">
+			<select class="form-control m-bot15" th:name="region">
+				<option value="-1">-- Chọn Khu vực --</option>
+				<option th:each="r : ${regions}" th:value="${{r}}"
+					th:text="${r.name}" />
+			</select>
+		</div>
+	</div>
+</div>
+<div th:unless="${action!='search'}">
+	<select class="form-control" th:name="regionId" id="regionId">
+		<option value="-1">-- Tất cả --</option>
+		<option th:each="r : ${regions}" th:value="${{r}}" th:text="${r.name}"
+			th:if="${r.id==regionId}" selected />
+		<option th:each="r : ${regions}" th:value="${{r}}" th:text="${r.name}"
+			th:unless="${r.id==regionId}" />
+	</select>
+</div>

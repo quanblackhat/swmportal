@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:th="http://www.thymeleaf.org"
+	layout:decorate="~{admin/fragments/layout}">
+<head>
+<title>Devices</title>
+<link href="/static/admin/css/bootstrap-datetimepicker.css"
+	rel="stylesheet" />
+<script src="/static/admin/js/moment-with-locales.js"></script>
+<script src="/static/admin/js/bootstrap-datetimepicker.js"></script>
+<script th:inline="javascript">
+	$(function() {
+		$('#datetimepicker').datetimepicker({
+			locale : 'vi',
+			format : 'DD/MM/YYYY',
+		});
+	});
+	loadLevel();
+	function loadLevel() {
+		var level = $("#level option:selected").val();
+		if(level==1){
+			$('#loadObjectbyLevel').show();
+			$('#levelLabel').html("Thuộc CT nước");
+
+		}else if(level==2){
+			$('#loadObjectbyLevel').show();
+			$('#levelLabel').html("Thuộc Doanh nghiệp");
+
+		}else if(level==3){
+			$('#loadObjectbyLevel').show();
+			$('#levelLabel').html("Người dùng");
+
+		}else{
+			$('#loadObjectbyLevel').hide();
+		}
+		var url = '/admin/common/loadLevel?level=' + level;
+		$.ajax({
+			url : url,
+			type : 'GET',
+			cache : false,
+			success : function(data) {
+				$('#hm').html(data);
+				//loadRegion();
+			}
+		});
+	}
+
+	function loadRegion() {
+		var districtId = $("#districtId option:selected").val();
+		var url = '/admin/common/loadRegion?districtId=' + districtId;
+		$.ajax({
+			url : url,
+			type : 'GET',
+			cache : false,
+			success : function(data) {
+				$('#regionDiv').html(data);
+			}
+		});
+	}
+</script>
+</head>
+<body>
+	<!--main content start-->
+	<section id="main-content" layout:fragment="content"
+		style="min-height: 700px">
+		<section class="wrapper">
+
+			<h4 style="margin-bottom: 20px">
+				<i class="fa fa-tasks"></i> <span>Quản lý tài khoản</span>
+			</h4>
+
+		
+			<div>
+				<section class="panel">
+					<header class="panel-heading">Thêm mới tài khoản</header>
+					<div class="panel-body">
+						<form role="form" class="form-horizontal" th:object="${account}"
+							th:action="@{/admin/account/add}" method="post">
+						  <div class="col-lg-6">
+							<div class="form-group">
+								<label class="col-lg-4 col-sm-4 control-label">Tên truy nhập (*)</label>
+								<div class="col-lg-8">
+									<input th:name="username" type="text" class="form-control"
+										id="code" placeholder="" th:required="required">
+								</div>
+							</div>
+	                       <div class="form-group">
+								<label class="col-lg-4 col-sm-4 control-label">Nhập mật khẩu (*)
+								</label>
+								<div class="col-lg-8">
+									<input th:name="password" type="text" class="form-control"
+										id="code" placeholder="" th:required="required">
+								</div>
+							</div>
+								<div class="form-group">
+								<label class="col-lg-4 col-sm-4 control-label">Nhập lại mật khẩu (*)
+</label>
+								<div class="col-lg-8">
+									<input th:name="code" type="text" class="form-control"
+										id="code" placeholder="" th:required="required">
+								</div>
+							</div>
+								<div class="form-group">
+								<label class="col-lg-4 col-sm-4 control-label">Họ</label>
+								<div class="col-lg-8">
+									<input  type="text" class="form-control"
+										id="code" placeholder="" th:required="required">
+								</div>
+								
+							</div>
+								<div class="form-group">
+								<label class="col-lg-4 col-sm-4 control-label">Tên</label>
+								<div class="col-lg-8">
+									<input  type="text" class="form-control"
+										id="code" placeholder="" th:required="required">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-lg-4 col-sm-4 control-label">Số điện thoại</label>
+								<div class="col-lg-8">
+									<input type="text" class="form-control"
+										id="code" placeholder="" th:required="required">
+								</div>
+							</div>
+							</div>
+							 <div class="col-lg-6">
+							 	<div class="form-group">
+								<label class="col-lg-4 col-sm-4 control-label">Loại tài khoản</label>
+								<div class="col-lg-8">
+									<select th:name="level" class="form-control m-bot15" id="level"
+										onchange="loadLevel()">
+										
+										<option th:if="${acc.level} == 0" value="0">Admin</option>
+											<option th:if="${acc.level} == 1 or ${acc.level} == 0" value="1">Công ty nước</option>
+												<option th:if="${acc.level} == 2 or ${acc.level} == 1 or ${acc.level} == 0" value="2">Doanh nghiệp</option>
+													<option th:if="${acc.level} == 3 or ${acc.level} == 2 or ${acc.level} == 1 or ${acc.level} == 0" value="3">Người dùng</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group" id="loadObjectbyLevel">
+								<label class="col-lg-4 col-sm-4 control-label" id="levelLabel" >Thuộc CT nước</label>
+								<div class="col-lg-8">
+									<select th:name="agent.id" class="form-control m-bot15" id="hm">
+										<option th:each="p : ${hm}" th:value="${{p.key}}"
+											th:text="${p.value}" />
+									</select>
+								</div>
+							</div>
+
+					
+                          <div id="status">
+								<div class="form-group">
+									<label class="col-lg-4 col-sm-4 control-label">Trạng thái</label>
+									<div class="col-lg-8">
+										<select th:name="status" class="form-control m-bot15" >
+											<option value="1">Kích hoạt</option>
+											<option value="0">Tạm dừng</option>
+											
+										</select>
+									</div>
+								</div>
+							</div>
+						<!-- 	<div class="form-group">
+								<label class="col-lg-4 col-sm-4 control-label">Nhóm quyền</label>
+							<div class="col-lg-8">
+										<select class="form-control m-bot15" id="districtId"
+											onchange="loadRegion()">
+											<option value="-1">-- Chọn doanh nghiệp --</option>
+											<option th:each="d : ${districts}" th:value="${{d}}"
+												th:text="${d.name}" />
+										</select>
+									</div>
+							</div> -->
+ </div>
+							<div class="form-group">
+								<div class="col-lg-offset-2 col-lg-10">
+									<button type="submit" class="btn btn-info">Thêm</button>
+									<a href="/admin/account" class="btn btn-info">Quay lại</a>
+								</div>
+							</div>
+							
+						</form>
+					</div>
+				</section>
+
+			</div>
+
+		</section>
+	</section>
+</body>

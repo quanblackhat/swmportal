@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:th="http://www.thymeleaf.org">
+
+<div th:if="${action!='search'}">
+	<div class="form-group">
+		<label class="col-lg-2 col-sm-2 control-label">Quận/huyện/thị
+			xã</label>
+		<div class="col-lg-10">
+			<select class="form-control m-bot15" id="districtId"
+				onchange="loadRegion()">
+				<option value="-1">-- Chọn Quận/huyện/thị xã --</option>
+				<option th:each="d : ${districts}" th:value="${{d}}"
+					th:text="${d.name}" />
+			</select>
+		</div>
+	</div>
+</div>
+<div th:unless="${action!='search'}">
+	<select class="form-control" onchange="loadRegion()" id="districtId"
+		th:name="districtId">
+		<option value="-1">-- Tất cả --</option>
+		<option th:each="d : ${districts}" th:value="${{d}}"
+			th:text="${d.name}" th:if="${d.id==districtId}" selected />
+		<option th:each="d : ${districts}" th:value="${{d}}"
+			th:text="${d.name}" th:unless="${d.id==districtId}" />
+	</select>
+</div>

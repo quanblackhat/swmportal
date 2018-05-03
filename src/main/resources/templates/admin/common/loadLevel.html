@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:th="http://www.thymeleaf.org">
+
+	                       <div class="form-group" id="loadObjectbyLevel">
+								<label class="col-lg-4 col-sm-4 control-label" id="levelLabel" >Thuộc CT nước</label>
+								<div class="col-lg-8">
+									<select class="form-control m-bot15" id="hm">
+										<option th:each="p : ${hm}" th:value="${{p.key}}"
+											th:text="${p.value}" />
+									</select>
+								</div>
+							</div>

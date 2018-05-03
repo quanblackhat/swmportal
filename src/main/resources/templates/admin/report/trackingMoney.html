@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{admin/fragments/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Measure Transaction</title>
+    <link href="/static/admin/css/bootstrap-datetimepicker.css" rel="stylesheet" />
+    <script src="/static/admin/js/jquery.twbsPagination.min.js"></script>
+    <script src="/static/admin/js/moment-with-locales.js"></script>
+    <script src="/static/admin/js/bootstrap-datetimepicker.js"></script>
+    <script src="/static/admin/js/checkbox.js"></script>
+    <script src="/static/admin/js/jspdf.min.js"></script>
+    <script th:inline="javascript">
+		$(document).ready(function() {
+			if([[${totalPages}]] !== null){
+				$(function() {
+					hiddenButton();
+					var currentPage = [[${page}]];
+					window.pagObj = $('#pagination').twbsPagination({
+						totalPages :  [[${totalPages}]],
+						visiblePages : 6,
+						startPage : currentPage,
+						onPageClick : function(event, page) {
+						}
+					}).on('page', function(event, page) {
+						var companyId = $("#companyId option:selected").val();
+						var userName = $("#userName").val();
+						var provinceId = $("#provinceId option:selected").val();
+						var districtId = $("#districtId option:selected").val();
+						var regionId = $("#regionId option:selected").val();
+						var month = $("#month").val();
+						var year = $("#year").val();
+
+
+						var url = '/admin/report/trackingMoney?page=' + page
+							+'&companyId=' + companyId
+							+'&userName=' + userName
+							+'&provinceId=' + provinceId
+							+'&districtId=' + districtId
+							+'&regionId=' + regionId
+							+'&month=' + month
+							+'&year=' + year;
+						$.ajax({
+							url : url,
+							type : 'GET',
+							cache : false,
+							success : function(data) {
+								$('#tableTrackingMoney').html(data);
+                                loadChecked();
+							}
+						});
+					});
+				});
+			}
+
+		});
+
+		$(function() {
+			$('.custom-date-picker').datetimepicker({
+				locale : 'vi',
+				format : 'DD/MM/YYYY'
+			});
+		});
+
+		function loadDistrict() {
+			var provinceId = $("#provinceId option:selected").val();
+			var url = '/admin/common/loadDistrict?action=search&provinceId=' + provinceId;
+			$.ajax({
+				url : url,
+				type : 'GET',
+				cache : false,
+				success : function(data) {
+					$('#district').html(data);
+					loadRegion();
+				}
+			});
+		}
+
+		function loadRegion() {
+			var districtId = $("#districtId option:selected").val();
+			var url = '/admin/common/loadRegion?action=search&districtId=' + districtId;
+			$.ajax({
+				url : url,
+				type : 'GET',
+				cache : false,
+				success : function(data) {
+					$('#region').html(data);
+				}
+			});
+		}
+
+        function printBill(deviceCode, month, year) {
+            $.ajax({
+                url : '/admin/report/exportBill?deviceCode=' + deviceCode
+                    +'&month=' + month
+                    +'&year=' + year,
+                type : 'GET',
+                contentType: "application/html; charset=utf-8",
+                cache : false,
+                success : function(data) {
+                    var originalContents = document.body.innerHTML;
+
+					$('#printArea').html(data);
+					var printContents = document.getElementById('printArea').innerHTML;
+
+                    document.body.innerHTML = printContents;
+                    window.print();
+                    document.body.innerHTML = originalContents;
+                    window.close();
+                    location.reload();
+                    loadChecked();
+                }
+            });
+        }
+
+
+		function printBills() {
+            var filterForm = new FormData(document.getElementById('filterForm'));
+
+            $.ajax({
+            	url : '/admin/report/exportBills',
+            	type : 'GET',
+            	contentType: "application/html; charset=utf-8",
+            	data : {
+            	    deviceCodes: getSelectedString(),
+                    month: filterForm.get("month"),
+                    year: filterForm.get("year")
+                },
+            	cache : false,
+            	success : function(data) {
+            		var originalContents = document.body.innerHTML;
+            		$('#printArea').html(data);
+            		var printContents = document.getElementById('printArea').innerHTML;
+            		document.body.innerHTML = printContents;
+            		window.print();
+            		document.body.innerHTML = originalContents;
+            		window.close();
+                    location.reload();
+                    loadChecked();
+            	}
+            });
+		}
+    </script>
+    <style type="text/css">
+        .form-control {
+            width: 70%;
+        }
+
+        .form-group select {
+            width: 70%;
+        }
+
+        .col-lg-10 {
+            float: none
+        }
+
+        .input-group {
+            width: 70%;
+        }
+    </style>
+    <style type="text/css" media="print">
+        @page
+        {
+            size: A4;
+            margin: 3mm;
+        }
+        html
+        {
+            background-color: #FFFFFF;
+            margin: 0px;  /* this affects the margin on the html before sending to printer */
+        }
+
+
+    </style>
+</head>
+<body>
+<!--main content start-->
+<section id="main-content" layout:fragment="content"
+         style="min-height: 700px">
+    <section class="wrapper">
+
+        <h4 style="margin-bottom: 20px">
+            <i class="fa fa-tasks"></i> <span>Giám sát tiền nước tiêu thụ</span>
+        </h4>
+
+        <!-- Search -->
+
+        <form role="form" class="form-horizontal" th:action="@{/admin/report/trackingMoney}" method="get" id = "filterForm">
+            <div class="row">
+                <div class="col-lg-6 col-md-6" th:unless="${role=='CUSTOMER'}">
+                    <div class="form-group" th:if="${role=='ADMIN'}">
+                        <label class="col-lg-4 col-sm-4 control-label">Công ty nước</label>
+                        <div class="col-lg-8">
+                            <select class="form-control" id="companyId" th:name="companyId" >
+                                <option value="-1">-- Tất cả --</option>
+                                <option th:each="c : ${companies}" th:value="${{c}}"
+                                        th:text="${c.name}" th:if="${c.id==companyId}" selected />
+                                <option th:each="c : ${companies}" th:value="${{c}}"
+                                        th:text="${c.name}" th:unless="${c.id==companyId}" />
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-lg-4 control-label">Tên khách hàng</label>
+                        <div class="col-lg-8">
+                            <input th:name="userName" type="text" class="form-control" id="userName"
+                                   th:value="${userName}" placeholder="Nhập tên khách hàng">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-4 col-sm-4 control-label">Tỉnh/Thành phố</label>
+                        <div class="col-lg-8">
+                            <select class="form-control" onchange="loadDistrict()"
+                                    id="provinceId" th:name="provinceId">
+                                <option value="-1">-- Tất cả --</option>
+                                <option th:each="p : ${provinces}" th:value="${{p}}"
+                                        th:text="${p.name}" th:if="${p.id==provinceId}" selected />
+                                <option th:each="p : ${provinces}" th:value="${{p}}"
+                                        th:text="${p.name}" th:unless="${p.id==provinceId}" />
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-lg-4 col-sm-4 control-label">Quận/huyện/thị xã</label>
+                        <div id="district" class="col-lg-8">
+                            <select class="form-control" onchange="loadRegion()"
+                                    id="districtId" th:name="districtId">
+                                <option value="-1">-- Tất cả --</option>
+                                <option th:each="d : ${districts}" th:value="${{d}}"
+                                        th:text="${d.name}" th:if="${d.id==districtId}" selected />
+                                <option th:each="d : ${districts}" th:value="${{d}}"
+                                        th:text="${d.name}" th:unless="${d.id==districtId}" />
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-4 col-sm-4 control-label">Khu vực</label>
+                        <div id="region" class="col-lg-8">
+                            <select class="form-control" th:name="regionId"
+                                    id="regionId">
+                                <option value="-1">-- Tất cả --</option>
+                                <option th:each="r : ${regions}" th:value="${{r}}"
+                                        th:text="${r.name}" th:if="${r.id==regionId}" selected />
+                                <option th:each="r : ${regions}" th:value="${{r}}"
+                                        th:text="${r.name}" th:unless="${r.id==regionId}" />
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <div class="form-group">
+                        <label class="col-lg-2 col-sm-2 control-label">Tháng</label>
+                        <div class="col-lg-6">
+                            <select id="month" class="form-control" th:name="month" style="max-width: 200px">
+                                <option value="-1">-- Chọn Tháng --</option>
+                                <option th:each="m:${months}" th:value="${m}"
+                                        th:if="${m<month}" th:text="${m}"></option>
+                                <option th:each="m:${months}" th:value="${m}"
+                                        th:if="${m==month}" th:text="${m}" selected></option>
+                                <option th:each="m:${months}" th:value="${m}"
+                                        th:if="${m>month}" th:text="${m}"></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-lg-2 col-sm-2 control-label">Năm</label>
+                        <div class="col-lg-6">
+                            <select id="year" class="form-control" th:name="year" style="max-width: 200px">
+                                <option value="-1">-- Chọn Năm --</option>
+                                <option th:each="y:${years}" th:value="${y}"
+                                        th:if="${y<year}" th:text="${y}"></option>
+                                <option th:each="y:${years}" th:value="${y}"
+                                        th:if="${y==year}" th:text="${y}" selected></option>
+                                <option th:each="y:${years}" th:value="${y}"
+                                        th:if="${y>year}" th:text="${y}"></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-left: 1px">
+                <div class='input-group'>
+                    <button type="submit" class="btn btn-info">Tra cứu kết quả</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- main body -->
+        <form role="form" class="form-horizontal" id="getBillsForm" th:action="@{/admin/report/exportBills}">
+            <div style="display: none" id="addcheckbox"></div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <section class="panel">
+                        <header class="panel-heading">Danh sách tiền nước tiêu thụ</header>
+                        <table class="table table-striped table-advance table-hover" id="tableTrackingMoney">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                <th>Công ty nước</th>
+                                <th>Tên khách hàng</th>
+                                <th>Mã số thiết bị</th>
+                                <th>Mục đích sử dụng</th>
+                                <th>Chỉ số cũ(m3)</th>
+                                <th>Chỉ số mới(m3)</th>
+                                <th>Lượng nước sử dụng(m3)</th>
+                                <th>Tổng thanh toán (VND)</th>
+                                <th>Trạng thái</th>
+                                <th>
+                                    <button type="button" class="btn btn-info" id="deletes"
+                                            onclick="printBills()">In Tất Cả</button>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="m : ${measures}">
+                                <td><input type="checkbox" th:name="chooses"
+                                           th:value="${m.device?.code}" th:id="${m.device?.code}" class="fucker"
+                                           th:onchange="'saveChecked(' + '\'' + ${m.device?.code} + '\'' + ')'"></td>
+                                <td><span th:text="${m.companyName}"></span></td>
+                                <td><span th:text="${m.customerName}"></span></td>
+                                <td><span th:text="${m.device?.code}"></span></td>
+                                <td><span th:text="${m.usesName}"></span></td>
+                                <td><span th:text="${#numbers.formatDecimal(m.oldMetric, 1, 2)}"></span></td>
+                                <td><span th:text="${#numbers.formatDecimal(m.newMetric, 1, 2)}"></span></td>
+                                <td><span th:text="${#numbers.formatDecimal(m.amount, 1, 2)}"></span></td>
+                                <td><span th:text="${#numbers.formatDecimal(m.totalMoney, 1, 2)}"></span></td>
+                                <td><span th:if="${m.status==1}">Đã thanh toán</span>
+                                    <span th:if="${m.status==0}">Chưa thanh toán</span></td>
+                                <td><a th:if="${m.totalMoney > 0}" href="#" style="margin-left: 3px "
+                                       th:onclick="'printBill(' + '\'' +${m.device?.code} + '\'' +',' + ${month}+',' + ${year} + ')'">
+                                    In Hóa Đơn</a></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </section>
+                </div>
+            </div>
+        </form>
+        <ul id="pagination" class="pagination-sm pagination" style="float: right"></ul>
+        <div style="display: none" id="printArea"></div>
+        <!-- end main body -->
+    </section>
+</section>
+<!--main content end-->
+</body>
+</html>

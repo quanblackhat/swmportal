@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:th="http://www.thymeleaf.org"
+	layout:decorate="~{admin/fragments/layout}">
+<head>
+<title>Measure Transaction</title>
+<link href="/static/admin/css/bootstrap-datetimepicker.css"
+	rel="stylesheet" />
+<script src="/static/admin/js/jquery.twbsPagination.min.js"></script>
+<script src="/static/admin/js/moment-with-locales.js"></script>
+<script src="/static/admin/js/bootstrap-datetimepicker.js"></script>
+<script src="/static/admin/js/checkbox.js"></script>
+<script th:inline="javascript">
+		$(document).ready(function() {
+			$(function() {
+				hiddenButton();
+				var currentPage = [[${page}]];
+				var $pagination = $('#pagination');
+				window.pagObj = $('#pagination').twbsPagination({
+					totalPages :  [[${totalPages}]],
+					visiblePages : 6,
+					startPage : currentPage,
+					onPageClick : function(event, page) {
+					}
+				}).on('page', function(event, page) {
+					var name = $("#name").val();
+					var code = $("#code").val();
+					var regionId = $("#regionId option:selected").val();
+					var provinceId = $("#provinceId option:selected").val();
+					var districtId = $("#districtId option:selected").val();
+					var startDate = $("#startDate").val();
+					var endDate = $("#endDate").val();
+					var url = '/admin/measureTrans/list?page=' + page
+							+'&name=' + name
+							+'&regionId=' + regionId
+							+'&districtId=' + districtId
+							+'&provinceId=' + provinceId
+							+'&startDate=' + startDate
+							+'&endDate=' + endDate
+							+'&code=' + code;
+					$.ajax({
+						url : url,
+						type : 'GET',
+						cache : false,
+						success : function(data) {
+							$('#tableDevices').html(data);
+							loadChecked();
+						}
+					});
+				});
+			});
+		});
+		
+		$(function() {
+			$('#datetimepickerstart').datetimepicker({
+                locale: 'vi',
+                format: 'DD/MM/YYYY',
+                defaultDate: new Date()
+            });
+			
+			$('#datetimepickerend').datetimepicker({
+                locale: 'vi',
+                format: 'DD/MM/YYYY',
+                defaultDate: new Date()
+            });
+        });
+		
+		function loadDistrict() {
+			var provinceId = $("#provinceId option:selected").val();
+			var url = '/admin/common/loadDistrict?action=search&provinceId=' + provinceId;
+			$.ajax({
+				url : url,
+				type : 'GET',
+				cache : false,
+				success : function(data) {
+					$('#districtDiv').html(data);
+					loadRegion();
+				}
+			});
+		}
+
+		function loadRegion() {
+			var districtId = $("#districtId option:selected").val();
+			var url = '/admin/common/loadRegion?action=search&districtId=' + districtId;
+			$.ajax({
+				url : url,
+				type : 'GET',
+				cache : false,
+				success : function(data) {
+					$('#regionDiv').html(data);
+				}
+			});
+		}
+	</script>
+
+<style type="text/css">
+.form-control {
+	width: 50%;
+}
+
+.form-group select {
+	width: 30%;
+}
+
+.col-lg-10 {
+	float: none
+}
+
+.input-group {
+	width: 20%;
+}
+</style>
+
+</head>
+<body>
+	<!--main content start-->
+	<section id="main-content" layout:fragment="content"
+		style="min-height: 700px">
+		<section class="wrapper">
+
+			<h4 style="margin-bottom: 20px">
+				<i class="fa fa-tasks"></i> <span>Giám sát lượng nước tiêu
+					thụ</span>
+			</h4>
+
+			<!-- Search -->
+			<form role="form" class="form-horizontal"
+				th:action="@{/admin/measureTrans/list}" method="get">
+				<div class="form-group">
+					<label class="col-lg-2 col-sm-2 control-label">Tên khách
+						hàng</label>
+					<div class="col-lg-10">
+						<input th:name="name" type="text" class="form-control" id="name"
+							th:value="${name}" placeholder="Tên khách hàng">
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-lg-2 col-sm-2 control-label">Mã thiết bị</label>
+					<div class="col-lg-10">
+						<input th:name="code" type="text" class="form-control" id="code"
+							th:value="${code}" placeholder="Mã thiết bị">
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-lg-2 col-sm-2 control-label">Tỉnh/Thành
+						phố</label>
+					<div class="col-lg-10">
+						<select class="form-control" onchange="loadDistrict()"
+							id="provinceId" th:name="provinceId">
+							<option value="-1">-- Tất cả --</option>
+							<option th:each="p : ${provinces}" th:value="${{p}}"
+								th:text="${p.name}" th:if="${p.id==provinceId}" selected />
+							<option th:each="p : ${provinces}" th:value="${{p}}"
+								th:text="${p.name}" th:unless="${p.id==provinceId}" />
+						</select>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-lg-2 col-sm-2 control-label">Quận/huyện/thị
+						xã</label>
+					<div id="districtDiv" class="col-lg-10">
+						<select class="form-control" onchange="loadRegion()"
+							id="districtId" th:name="districtId">
+							<option value="-1">-- Tất cả --</option>
+							<option th:each="d : ${districts}" th:value="${{d}}"
+								th:text="${d.name}" th:if="${d.id==districtId}" selected />
+							<option th:each="d : ${districts}" th:value="${{d}}"
+								th:text="${d.name}" th:unless="${d.id==districtId}" />
+						</select>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-lg-2 col-sm-2 control-label">Khu vực</label>
+					<div id="regionDiv" class="col-lg-10">
+						<select class="form-control" th:name="regionId" id="regionId">
+							<option value="-1">-- Tất cả --</option>
+							<option th:each="r : ${regions}" th:value="${{r}}"
+								th:text="${r.name}" th:if="${r.id==regionId}" selected />
+							<option th:each="r : ${regions}" th:value="${{r}}"
+								th:text="${r.name}" th:unless="${r.id==regionId}" />
+						</select>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-lg-2 col-sm-2 control-label">Ngày bắt đầu</label>
+					<div class='input-group date col-sm-2' id='datetimepickerstart'>
+						<input type='text' class="form-control" th:name="startdate"
+							id="startDate" th:value="${startdate}" required="required" /> <span
+							class="input-group-addon"> <span
+							class="glyphicon glyphicon-calendar"></span>
+						</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-lg-2 col-sm-2 control-label">Ngày kết
+						thúc</label>
+					<div class='input-group date col-sm-2' id='datetimepickerend'>
+						<input type='text' class="form-control" th:name="enddate"
+							id="endDate" th:value="${enddate}" required="required" /> <span
+							class="input-group-addon"> <span
+							class="glyphicon glyphicon-calendar"></span>
+						</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-lg-2 col-sm-2 control-label"></label>
+					<div class='input-group date col-lg-10' id='datetimepickerend'>
+						<button type="submit" class="btn btn-info">Tìm kiếm</button>
+					</div>
+				</div>
+			</form>
+
+			<!-- main body -->
+			<div class="row">
+				<div class="col-lg-12">
+					<section class="panel">
+						<header class="panel-heading">Danh sách lượng nước tiêu
+							thụ</header>
+						<table class="table table-striped table-advance table-hover"
+							id="tableDevices">
+							<thead>
+								<tr>
+									<th>Tên khách hàng</th>
+									<th>Mã thiết bị</th>
+									<th>Tỉnh/thành phố</th>
+									<th>Quận/huyện/thị xã</th>
+									<th>Khu vực</th>
+									<th>Chỉ số (m3)</th>
+									<th>Ngày nhận dữ liệu</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="m : ${measureTrans}">
+									<td><span th:text="${m.user?.name}"></span></td>
+									<td><span th:text="${m.device?.code}"></span></td>
+									<td><span
+										th:text="${m.user?.region?.district?.province?.name}"></span></td>
+									<td><span th:text="${m.user?.region?.district?.name}"></span></td>
+									<td><span th:text="${m.user?.region?.name}"></span></td>
+									<td><span th:text="${m.amount}"></span></td>
+									<td><span
+										th:text="${#dates.format(m.transactionDate, 'dd/MM/yyyy')}"></span></td>
+								</tr>
+							</tbody>
+						</table>
+					</section>
+				</div>
+			</div>
+
+			<ul id="pagination" class="pagination-sm pagination"
+				style="float: right"></ul>
+
+			<!-- end main body -->
+		</section>
+	</section>
+	<!--main content end-->
+</body>
+
+</html>

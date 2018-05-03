@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:th="http://www.thymeleaf.org"
+	layout:decorate="~{admin/fragments/layout}">
+<head>
+<title>Users</title>
+<link href="/static/admin/css/bootstrap-datetimepicker.css"
+	rel="stylesheet" />
+<script src="/static/admin/js/moment-with-locales.js"></script>
+<script src="/static/admin/js/bootstrap-datetimepicker.js"></script>
+<script th:inline="javascript">
+	function loadDistrict() {
+		var provinceId = $("#provinceId option:selected").val();
+		var url = '/admin/common/loadDistrict?provinceId=' + provinceId;
+		$.ajax({
+			url : url,
+			type : 'GET',
+			cache : false,
+			success : function(data) {
+				$('#districtDiv').html(data);
+				loadRegion();
+			}
+		});
+	}
+
+	function loadRegion() {
+		var districtId = $("#districtId option:selected").val();
+		var url = '/admin/common/loadRegion?districtId=' + districtId;
+		$.ajax({
+			url : url,
+			type : 'GET',
+			cache : false,
+			success : function(data) {
+				$('#regionDiv').html(data);
+			}
+		});
+	}
+</script>
+</head>
+<body>
+	<!--main content start-->
+	<section id="main-content" layout:fragment="content"
+		style="min-height: 700px">
+		<section class="wrapper">
+
+			<h4 style="margin-bottom: 20px">
+				<i class="fa fa-tasks"></i> <span>Quản lý khách hàng cá nhân</span>
+			</h4>
+
+			<div>
+				<section class="panel">
+					<header class="panel-heading">Tạo đơn đề nghị cung cấp
+						nước sạch</header>
+					<div class="panel-body">
+						<form role="form" class="form-horizontal" th:object="${contract}"
+							th:action="@{/admin/contract/createForm/user}" method="post">
+							<input type="hidden" th:name="user" th:value="${{user}}" />
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Tên khách
+									hàng</label>
+								<div class="col-lg-10">
+									<span th:text="${user.name}"
+										class="col-lg-2 col-sm-2 control-label"></span>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Người sử
+									dụng:</label>
+								<div class="col-lg-10">
+									<input th:name="userUses" type="text" class="form-control"
+										id="userUses" placeholder="Người sử dụng">
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Lượng
+									nước dự kiến sử dụng:</label>
+								<div class="col-lg-10">
+									<input th:name="expectAmount" type="text" class="form-control"
+										id="expectAmount" placeholder="Lượng nước dự kiến sử dụng">
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Đăng ký</label>
+								<div class="col-lg-10">
+									<select class="form-control m-bot15" th:name="registerType">
+										<option value="1">Lắp đặt mới</option>
+										<option value="2">Tách hộ</option>
+										<option value="3">Lắp đặt lại</option>
+									</select>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Mục đích
+									sử dụng</label>
+								<div class="col-lg-10">
+									<select class="form-control m-bot15" th:name="uses">
+										<option th:each="u : ${uses}" th:value="${{u}}"
+											th:text="${u.name}" />
+									</select>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<div class="col-lg-offset-2 col-lg-10">
+									<button type="submit" class="btn btn-info">Tạo đơn</button>
+									<a href="/admin/users" class="btn btn-info">Quay lại</a>
+								</div>
+							</div>
+						</form>
+					</div>
+				</section>
+
+			</div>
+
+		</section>
+	</section>
+</body>

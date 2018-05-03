@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:th="http://www.thymeleaf.org"
+	layout:decorate="~{admin/fragments/layout}">
+<head>
+<title>Users</title>
+<link href="/static/admin/css/bootstrap-datetimepicker.css"
+	rel="stylesheet" />
+<script src="/static/admin/js/moment-with-locales.js"></script>
+<script src="/static/admin/js/bootstrap-datetimepicker.js"></script>
+<script th:inline="javascript">
+	function loadDistrict() {
+		var provinceId = $("#provinceId option:selected").val();
+		var url = '/admin/common/loadDistrict?provinceId=' + provinceId;
+		$.ajax({
+			url : url,
+			type : 'GET',
+			cache : false,
+			success : function(data) {
+				$('#districtDiv').html(data);
+				loadRegion();
+			}
+		});
+	}
+
+	function loadRegion() {
+		var districtId = $("#districtId option:selected").val();
+		var url = '/admin/common/loadRegion?districtId=' + districtId;
+		$.ajax({
+			url : url,
+			type : 'GET',
+			cache : false,
+			success : function(data) {
+				$('#regionDiv').html(data);
+			}
+		});
+	}
+</script>
+</head>
+<body>
+	<!--main content start-->
+	<section id="main-content" layout:fragment="content"
+		style="min-height: 700px">
+		<section class="wrapper">
+
+			<h4 style="margin-bottom: 20px">
+				<i class="fa fa-tasks"></i> <span>Quản lý khách hàng cá nhân</span>
+			</h4>
+
+			<a href="/admin/users/redirect?action=viewAdd" class="btn btn-info"
+				style="margin-bottom: 10px;">NHẬP TỪ EXCEL</a>
+			<!--  -->
+			<a href="/admin/users/redirect?action=viewAdd" class="btn btn-info"
+				style="margin-bottom: 10px;">Mẫu EXCEL</a>
+
+			<div>
+				<section class="panel">
+					<header class="panel-heading">Thêm mới khách hàng cá nhân</header>
+					<div class="panel-body">
+						<form role="form" class="form-horizontal" th:object="${users}"
+							th:action="@{/admin/users}" method="post">
+							
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Tên khách hàng:</label>
+								<div class="col-lg-10">
+									<input th:name="name" type="text" class="form-control"
+										id="name" placeholder="Tên khách hàng" th:required="required">
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Mã khách hàng:</label>
+								<div class="col-lg-10">
+									<input th:name="userCode" type="text" class="form-control"
+										id="userCode" placeholder="Mã khách hàng">
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Số chứng minh thư nhân dân:</label>
+								<div class="col-lg-10">
+									<input th:name="idCard" type="text" class="form-control"
+										id="idCard" placeholder="Số chứng minh thư nhân dân">
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Số điện thoại:</label>
+								<div class="col-lg-10">
+									<input th:name="phoneNumber" type="text" class="form-control"
+										id="phoneNumber" placeholder="Số điện thoại">
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Số nhà:</label>
+								<div class="col-lg-10">
+									<input th:name="addressNo" type="text" class="form-control"
+										id="no" placeholder="Số nhà">
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Ngõ:</label>
+								<div class="col-lg-10">
+									<input th:name="addressLand" type="text" class="form-control"
+										id="lane" placeholder="Ngõ">
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Ngách:</label>
+								<div class="col-lg-10">
+									<input th:name="addressAlley" type="text" class="form-control"
+										id="alley" placeholder="Nghách">
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Hẻm:</label>
+								<div class="col-lg-10">
+									<input th:name="addressAlley2" type="text" class="form-control"
+										id="alley2" placeholder="Hẻm">
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Đường phố, Khu ĐT (xóm, thôn, tổ):</label>
+								<div class="col-lg-10">
+									<input th:name="addressStreet" type="text" class="form-control"
+										id="street" placeholder="Đường phố, Khu ĐT (xóm, thôn, tổ)">
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="col-lg-2 col-sm-2 control-label">Tỉnh/Thành
+									phố:</label>
+								<div class="col-lg-10">
+									<select class="form-control m-bot15" id="provinceId"
+										onchange="loadDistrict()">
+										<option value="-1">-- Chọn Tỉnh/Thành phố --</option>
+										<option th:each="p : ${provinces}" th:value="${{p}}"
+											th:text="${p.name}" />
+									</select>
+								</div>
+							</div>
+
+							<div id="districtDiv">
+								<div class="form-group">
+									<label class="col-lg-2 col-sm-2 control-label">Quận/huyện/thị
+										xã:</label>
+									<div class="col-lg-10">
+										<select class="form-control m-bot15" id="districtId"
+											onchange="loadRegion()">
+											<option value="-1">-- Chọn Quận/huyện/thị xã --</option>
+											<option th:each="d : ${districts}" th:value="${{d}}"
+												th:text="${d.name}" />
+										</select>
+									</div>
+								</div>
+							</div>
+
+							<div id="regionDiv">
+								<div class="form-group">
+									<label class="col-lg-2 col-sm-2 control-label">Khu vực:</label>
+									<div class="col-lg-10">
+										<select class="form-control m-bot15" th:name="region">
+											<option value="-1">-- Chọn Khu vực --</option>
+											<option th:each="r : ${regions}" th:value="${{r}}"
+												th:text="${r.name}" />
+										</select>
+									</div>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<div class="col-lg-offset-2 col-lg-10">
+									<button type="submit" class="btn btn-info">Thêm mới</button>
+									<a href="/admin/users" class="btn btn-info">Quay lại</a>
+								</div>
+							</div>
+						</form>
+					</div>
+				</section>
+
+			</div>
+
+		</section>
+	</section>
+</body>

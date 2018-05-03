@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:th="http://www.thymeleaf.org"
+	layout:decorate="~{admin/fragments/layout}">
+<head>
+<title>Measure Transaction</title>
+
+
+</head>
+<body>
+	<!--main content start-->
+	<section id="main-content" layout:fragment="content"
+		style="min-height: 700px">
+		<section class="wrapper">
+
+			<h4 style="margin-bottom: 20px">
+				<i class="fa fa-tasks"></i> <span>Biểu đồ</span>
+			</h4>
+
+			<!-- Search -->
+			<form role="form" class="form-horizontal" action="/admin/measureTrans/chart"  method="get">
+				<div class="form-group">
+				    <table class=" table table-bordered">
+				    <tr>
+				    <td >Từ ngày</td>
+				    <td><input th:name="startdate" type="date" class="form-control"
+							 placeholder="Tên khách hàng" required="required"></td>
+				     <td>Đến ngày</td>
+				    <td><input th:name="enddate" type="date" class="form-control"
+							 placeholder="Tên khách hàng" required="required"></td>
+				    </tr>
+				    <tr>
+				      <td>Mã thiết bị</td>
+				      <td><input th:name="code" type="text" class="form-control"
+							 placeholder="Mã thiết bị" required="required"></td>
+				      <td></td>
+				      <td></td>
+				    </tr>
+				       <tr>
+				      <td colspan="4" align="right"><button type="submit" class="btn btn-info">Tìm kiếm</button></td>
+				      
+				    </tr>
+				    
+				    </table>
+				
+				</div>
+			</form>
+
+			<!-- main body -->
+			         <div id="morris">
+                  <div class="row">
+                        <div class="col-lg-12">
+                          <section class="panel">
+                              <header class="panel-heading">
+                                Chất lượng nước
+                              </header>
+                              <div class="panel-body">
+                                  <div id="hero-area" class="graph"></div>
+                              </div>
+                          </section>
+                      </div>
+                          <div class="col-lg-6">
+                          <section class="panel">
+                              <header class="panel-heading">
+                                  PH
+                              </header>
+                              <div class="panel-body">
+                                  <div id="ph" class="graph"></div>
+                              </div>
+                          </section>
+                      </div>
+                         <div class="col-lg-6">
+                          <section class="panel">
+                              <header class="panel-heading">
+                                  EC
+                              </header>
+                              <div class="panel-body">
+                                  <div id="ec" class="graph"></div>
+                              </div>
+                          </section>
+                      </div>
+                         <div class="col-lg-6">
+                          <section class="panel">
+                              <header class="panel-heading">
+                                  Nhiệt độ
+                              </header>
+                              <div class="panel-body">
+                                  <div id="nhietdo" class="graph"></div>
+                              </div>
+                          </section>
+                      </div>
+                         <div class="col-lg-6">
+                          <section class="panel">
+                              <header class="panel-heading">
+                                  TDS
+                              </header>
+                              <div class="panel-body">
+                                  <div id="tds" class="graph"></div>
+                              </div>
+                          </section>
+                      </div>
+                  </div>
+                  </div>
+             
+
+			
+
+			<!-- end main body -->
+		</section>
+
+	</section>
+	<!--main content end-->   
+	 
+	<section id="js" layout:fragment="js">
+	    <!--   <script src="/static/admin/js/morris-script.js"></script>  -->
+	      <script th:inline="javascript">
+	      /*<![CDATA[*/
+	      var Script = function () {
+	    		
+	    	    //morris chart
+	    	    
+	    	    $(function () {
+	    	      // data stolen from http://howmanyleft.co.uk/vehicle/jaguar_'e'_type
+	    	   /*   var tax_data = [
+	    	           {"period": "2011 Q3", "licensed": 3407, "sorned": 660},
+	    	           {"period": "2011 Q2", "licensed": 3351, "sorned": 629},
+	    	           {"period": "2011 Q1", "licensed": 3269, "sorned": 618},
+	    	           {"period": "2010 Q4", "licensed": 3246, "sorned": 661},
+	    	           {"period": "2009 Q4", "licensed": 3171, "sorned": 676},
+	    	           {"period": "2008 Q4", "licensed": 3155, "sorned": 681},
+	    	           {"period": "2007 Q4", "licensed": 3226, "sorned": 620},
+	    	           {"period": "2006 Q4", "licensed": 3245, "sorned": null},
+	    	           {"period": "2005 Q4", "licensed": 3289, "sorned": null}
+	    	      ];*/
+	    	  
+	    
+	    	      var  tax_data  =  [(${dataAll})];
+   	    
+                    
+	    	      var tax_dataPH = [(${dataPH})];
+	    	    
+	    	      var tax_dataEC = [(${dataEC})];
+	    	  
+	    	      var tax_dataND = [(${dataND})];
+	    	      var tax_dataTDS = [(${dataTDS})];
+	    	     
+	    	      
+	    	   
+	    	    //  Morris.Line({
+	    	    //    element: 'hero-graph',
+	    	     //   data: tax_data,
+	    	     //   xkey: 'period',
+	    	     //   ykeys: ['licensed', 'sorned'],
+	    	     //   labels: ['Licensed', 'Off the road'],
+	    	     //   lineColors:['#8075c4','#6883a3']
+	    	     // });
+
+	    	  /*    Morris.Donut({
+	    	        element: 'hero-donut',
+	    	        data: [
+	    	          {label: 'Jam', value: 25 },
+	    	          {label: 'Frosted', value: 40 },
+	    	          {label: 'Custard', value: 25 },
+	    	          {label: 'Sugar', value: 10 }
+	    	        ],
+	    	          colors: ['#41cac0', '#49e2d7', '#34a39b'],
+	    	        formatter: function (y) { return y + "%" }
+	    	      });*/
+
+	    	      Morris.Area({
+	    	        element: 'hero-area',
+	    	          data: tax_data,
+	    	          xkey: 'period',
+	    	          ykeys: ['ph', 'ec', 'nd','tds'],
+	    	          labels: ['PH', 'EC', 'Nhiệt độ','TDS'],
+	    	          hideHover: 'auto',
+	    	          lineWidth: 1,
+	    	          pointSize: 5,
+	    	          lineColors: ['#4a8bc2', '#ff6c60', '#a9d86e','#a9486e'],
+	    	          fillOpacity: 0.5,
+	    	          smooth: false
+	    	      });
+
+	    	/*      Morris.Bar({
+	    	        element: 'hero-bar',
+	    	        data: [
+	    	          {device: 'iPhone', geekbench: 136},
+	    	          {device: 'iPhone 3G', geekbench: 137},
+	    	          {device: 'iPhone 3GS', geekbench: 275},
+	    	          {device: 'iPhone 4', geekbench: 380},
+	    	          {device: 'iPhone 4S', geekbench: 655},
+	    	          {device: 'iPhone 5', geekbench: 1571}
+	    	        ],
+	    	        xkey: 'device',
+	    	        ykeys: ['geekbench'],
+	    	        labels: ['Geekbench'],
+	    	        barRatio: 0.4,
+	    	        xLabelAngle: 35,
+	    	        hideHover: 'auto',
+	    	        barColors: ['#6883a3']
+	    	      });*/
+
+	    	      new Morris.Line({
+	    	        element: 'ph',
+	    	        xkey: 'abc',
+	    	        ykeys: ['value'],
+	    	        labels: ['Value'],
+	    	        data: tax_dataPH
+	    	      });
+	    	      new Morris.Line({
+	    	          element: 'ec',
+	    	          xkey: 'abc',
+	    	          ykeys: ['value'],
+	    	          labels: ['Value'],
+	    	          data: tax_dataEC
+	    	        });
+	    	      new Morris.Line({
+	    	          element: 'tds',
+	    	          xkey: 'abc',
+	    	          ykeys: ['value'],
+	    	          labels: ['Value'],
+	    	          data:tax_dataTDS
+	    	        });
+	    	      new Morris.Line({
+	    	          element: 'nhietdo',
+	    	          xkey: 'abc',
+	    	          ykeys: ['value'],
+	    	          labels: ['Value'],
+	    	          data: tax_dataND
+	    	        });
+	    	      $('.code-example').each(function (index, el) {
+	    	        eval($(el).text());
+	    	      });
+	    	    });
+
+	      }();
+	      /*]]>*/
+	      </script>
+	</section>
+</body>
+
+</html>
