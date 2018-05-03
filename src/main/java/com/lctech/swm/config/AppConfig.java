@@ -17,6 +17,7 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.view.tiles3.TilesViewResolver;
 import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
+import org.thymeleaf.spring4.ISpringTemplateEngine;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring4.view.ThymeleafViewResolver;
@@ -61,13 +62,14 @@ public class AppConfig extends WebMvcConfigurerAdapter {
 	}
 
 	@Bean
-	public SpringTemplateEngine templateEngine() {
+	public ISpringTemplateEngine templateEngine() {
 		SpringTemplateEngine templateEngine=new SpringTemplateEngine();
 		templateEngine.setTemplateResolver(templateResolver());
 		templateEngine.addDialect(new LayoutDialect());
 		templateEngine.addDialect(new SpringSecurityDialect());
 		return templateEngine;
 	}
+
 
 	private ITemplateResolver templateResolver() {
 		SpringResourceTemplateResolver templateResolver=new SpringResourceTemplateResolver();

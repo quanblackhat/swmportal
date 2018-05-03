@@ -13,7 +13,7 @@ public class DataSourceConfig {
 
     @Value("${spring.datasource.driver-class-name}")
     private String driver;
-    @Value("jdbc:postgresql://localhost:5432/swmdb")
+    @Value("${spring.datasource.url}")
     private String url;
     @Value("${spring.datasource.username}")
     private String username;
